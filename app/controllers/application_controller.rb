@@ -7,7 +7,7 @@ class ApplicationController < ActionController::API
         header = request.headers["Authorization"]
         if header
             credentials = header.split(":")
-            @current_user = User.find_by(name: credentials[0])
+            @current_user = User.find_by(name: credentials[0]&.downcase)
 
             if @current_user && @current_user.authenticate(credentials[1])
             else
