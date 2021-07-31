@@ -1,0 +1,113 @@
+<div style="font-weight: 600; font-style: italic; margin-bottom: 2.5rem; font-family: Arial;">
+    <div style="width: 100%; position: relative; border-bottom: 2px solid black; margin-bottom: 0.125rem;">
+        <div style="font-size: 2.25rem; line-height: 2.5rem; text-align: center;">JR EXPRESS</div>
+        <div style="position: absolute; right: 0; bottom: 0;">
+            Invoice #: <span style="padding-left: 8px"><%= invoice.invoice_number %></span>
+        </div>
+    </div>
+    <div style="border-bottom: 1px solid black; width: 100%; margin-bottom: 1rem;"></div>
+
+    <div style="padding-left: 1.25rem; padding-right: 1.25rem;">
+        <div style="text-decoration: underline;">REMIT TO:</div>
+        <div style="text-align: center; font-size: 1.125rem; line-height: 1.375rem; margin-bottom: .75rem;">
+            3032 CAMERONDALE RD
+            <br />
+            BALDWINSVILLE, NY 13027
+            <br />
+            315-254-4667
+        </div>
+
+        <div style="text-decoration: underline;">BILL TO:</div>
+        <div style="text-align: center; font-size: 1.125rem; line-height: 1.375rem; margin-bottom: .75rem;">
+            <%= invoice.bill_to_company %>
+            <br />
+            <%= invoice.bill_to_street %>
+            <br />
+            <%= invoice.bill_to_city %>, <%= invoice.bill_to_state %> <%= invoice.bill_to_zip %>
+        </div>
+
+        <div>
+            Broker load #: <span style="padding-left: 8px"><%= invoice.broker_load_number %></span>
+        </div>
+
+        <% if invoice["reference_number"] %>
+            <div>
+                Reference #: <span style="padding-left: 8px"><%= invoice.reference_number %></span>
+            </div>
+        <% end %>
+
+        <% if invoice["pickup_number"] %>
+            <div>
+                Pickup #: <span style="padding-left: 8px"><%= invoice.pickup_number %></span>
+            </div>
+        <% end %>
+
+        <div style="border-bottom: 2px solid black; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+            JR EXPRESS Load #: <span style="padding-left: 8px"><%= invoice.invoice_number %></span>
+        </div>
+
+        <div style="margin-bottom: 1.5rem; display: -webkit-box; ">
+            <div style="width: 50%;">
+                <div style="margin-bottom: 1.5rem;">Pick up from:</div>
+                <div>
+                    <%= invoice.pickup_company %> <br />
+                    <%= invoice.pickup_street %> <br />
+                    <%= invoice.pickup_city %>, <%= invoice.pickup_state %> <%= invoice.pickup_zip %>
+                </div>
+            </div>
+            <div style="width: 50%;">
+                <div style="margin-bottom: 1.5rem;">Deliver to:</div>
+                <div>
+                    <%= invoice.deliver_to_company %> <br />
+                    <%= invoice.deliver_to_street %> <br />
+                    <%= invoice.deliver_to_city %>, <%= invoice.deliver_to_state %> <%= invoice.deliver_to_zip %>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div>INVOICE SUMMARY</div>
+            <table style="border: 1px solid rgb(229, 231, 235); width: 100%; border-collapse: collapse;">
+                <tbody>
+                    <tr>
+                         <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%;">
+                            Load pay
+                        </td>
+                         <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%; text-align: right;">
+                            <%= number_to_currency(invoice.load_pay) %>
+                        </td>
+                    </tr>
+                    <% if invoice["lumper"] %>
+                        <tr>
+                             <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%;">
+                                Lumper
+                            </td>
+                             <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%; text-align:right;">
+                                <%= number_to_currency(invoice.lumper) %>
+                            </td>
+                        </tr>
+                    <% end %>
+                    <tr>
+                         <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%; text-align: right;">
+                            TOTAL DUE
+                        </td>
+                        <% 
+                            lumper = invoice["lumper"] ||= 0
+                            total = invoice.load_pay + lumper
+                            total = number_to_currency(total)
+                        %>
+                         <td style="padding-top: 2px; padding-bottom: 2px; border: 1px solid rgb(229, 231, 235); padding-left: 1rem; padding-right: 1rem; width: 50%; text-align: right;"><%= total %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<% if invoice.images&.length > 0 %>
+    <p style="page-break-after: always;"></p>
+<% end %>
+
+<% invoice.images.each do |image| %>
+    <%= image_tag(image.url, height: "1250") %>
+<% end %>

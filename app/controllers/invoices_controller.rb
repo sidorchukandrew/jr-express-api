@@ -1,0 +1,108 @@
+class InvoicesController < ApplicationController
+  before_action :set_invoice, only: [:show, :update, :destroy]
+
+  # GET /invoices
+  def index
+    @invoices = Invoice.with_attached_pdf.all
+
+    invoices_hash = @invoices.map { |invoice| invoice.to_hash }
+
+    render json: invoices_hash
+  end
+
+  # GET /invoices/1
+  def show
+    render json: @invoice.to_hash
+  end
+
+  # POST /invoices
+  def create
+    @invoice = Invoice.new(invoice_params)
+
+    if @invoice.save
+      save_addresses
+      generate_pdf
+      invoice_with_pdf = @invoice.as_json
+      invoice_with_pdf[:pdf_url] = @invoice.pdf.url
+      render json: invoice_with_pdf, status: :created
+    else
+      render json: @invoice.errors, status: :unprocessable_entity
+    end
+  end
+
+  # PATCH/PUT /invoices/1
+  def update
+    if @invoice.update(invoice_params)
+      render json: @invoice
+    else
+      render json: @invoice.errors, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /invoices/1
+  def destroy
+    @invoice.destroy
+  end
+
+  def email
+    @invoice = Invoice.with_attached_pdf.find(params[:invoice_id]) 
+    InvoiceMailer.with(email: email_params, invoice: @invoice).invoice_pdf.deliver_now
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_invoice
+      @invoice = Invoice.with_attached_pdf.find(params[:id])
+    end
+
+    def email_params
+      params.permit([:subject, :body, :recipient])
+    end
+
+    # Only allow a list of trusted parameters through.
+    def invoice_params
+      params.permit([:bill_to_city, :bill_to_company, 
+        :bill_to_street, :bill_to_state, :bill_to_zip, :broker_load_number, 
+        :deliver_to_city, :deliver_to_company, :deliver_to_state, :deliver_to_street,
+        :deliver_to_zip, :invoice_number, :load_pay, :lumper, :pickup_number, :pickup_city,
+        :pickup_company, :pickup_street, :pickup_state, :pickup_zip, :reference_number, images: []]
+      )
+    end
+
+    def generate_pdf
+      pdf_html = ActionController::Base.new.render_to_string(template: 'invoices/show.html.erb', layout: 'pdf.html', locals: {invoice: @invoice})  
+      pdf = WickedPdf.new.pdf_from_string(pdf_html)
+
+      @invoice.pdf.attach(io: StringIO.new(pdf), filename: "invoice.pdf", content_type: "application/pdf")
+      @invoice.save
+    end
+
+    def save_addresses
+      bill_to = Address.find_or_create_by(address_type: "bill_to", company: @invoice.bill_to_company) do |address|
+        address.address_type = "bill_to"
+        address.company = @invoice.bill_to_company
+        address.street = @invoice.bill_to_street
+        address.city = @invoice.bill_to_city
+        address.state = @invoice.bill_to_state
+        address.zip = @invoice.bill_to_zip
+      end
+
+      pickup = Address.find_or_create_by(address_type: "pickup", company: @invoice.pickup_company) do |address|
+        address.address_type = "pickup"
+        address.company = @invoice.pickup_company
+        address.street = @invoice.pickup_street
+        address.city = @invoice.pickup_city
+        address.state = @invoice.pickup_state
+        address.zip = @invoice.pickup_zip
+      end
+
+      deliver_to = Address.find_or_create_by(address_type: "deliver_to", company: @invoice.deliver_to_company) do |address|
+        address.address_type = "deliver_to"
+        address.company = @invoice.deliver_to_company
+        address.street = @invoice.deliver_to_street
+        address.city = @invoice.deliver_to_city
+        address.state = @invoice.deliver_to_state
+        address.zip = @invoice.deliver_to_zip
+      end
+    end
+end
