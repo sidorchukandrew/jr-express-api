@@ -15,7 +15,7 @@ WickedPdf.config = {
   #   or
   # exe_path: Gem.bin_path('wkhtmltopdf-binary', 'wkhtmltopdf')
 
-  :exe_path => Rails.root.join('bin', 'wkhtmltopdf.exe').to_s,
+  # :exe_path => Rails.root.join('bin', 'wkhtmltopdf.exe').to_s,
 
   # Layout file to be used for all PDFs
   # (but can be overridden in `render :pdf` calls)
