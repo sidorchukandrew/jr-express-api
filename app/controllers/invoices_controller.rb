@@ -1,4 +1,8 @@
 class InvoicesController < ApplicationController
+  require 'combine_pdf'
+  require 'net/http'
+  require 'tempfile'
+
   before_action :set_invoice, only: [:show, :update, :destroy]
 
   # GET /invoices
@@ -65,15 +69,23 @@ class InvoicesController < ApplicationController
         :bill_to_street, :bill_to_state, :bill_to_zip, :broker_load_number, 
         :deliver_to_city, :deliver_to_company, :deliver_to_state, :deliver_to_street,
         :deliver_to_zip, :invoice_number, :load_pay, :lumper, :pickup_number, :pickup_city,
-        :pickup_company, :pickup_street, :pickup_state, :pickup_zip, :reference_number, images: []]
+        :pickup_company, :pickup_street, :pickup_state, :pickup_zip, :reference_number, attachments: []]
       )
     end
 
     def generate_pdf
       pdf_html = ActionController::Base.new.render_to_string(template: 'invoices/show.html.erb', layout: 'pdf.html', locals: {invoice: @invoice})  
-      pdf = WickedPdf.new.pdf_from_string(pdf_html)
+      first_page_of_pdf = WickedPdf.new.pdf_from_string(pdf_html)
 
-      @invoice.pdf.attach(io: StringIO.new(pdf), filename: "invoice.pdf", content_type: "application/pdf")
+      full_pdf = CombinePDF.new
+      full_pdf << CombinePDF.parse(first_page_of_pdf)
+
+      @invoice.attachments.each do |attachment|
+        full_pdf << CombinePDF.parse(Net::HTTP.get_response(URI.parse(attachment.url)).body)
+      end
+
+      @invoice.pdf.attach(io: StringIO.new(full_pdf.to_pdf), filename: "invoice #{@invoice.invoice_number}.pdf", content_type: "application/pdf")
+
       @invoice.save
     end
 

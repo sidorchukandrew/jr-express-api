@@ -27,23 +27,23 @@
         </div>
 
         <div>
-            Broker load #: <span style="padding-left: 8px"><%= invoice.broker_load_number %></span>
+            Broker load #: <span style="padding-left: 4px"><%= invoice.broker_load_number %></span>
         </div>
 
         <% if invoice["reference_number"] %>
             <div>
-                Reference #: <span style="padding-left: 8px"><%= invoice.reference_number %></span>
+                Reference #: <span style="padding-left: 4px"><%= invoice.reference_number %></span>
             </div>
         <% end %>
 
         <% if invoice["pickup_number"] %>
             <div>
-                Pickup #: <span style="padding-left: 8px"><%= invoice.pickup_number %></span>
+                Pickup #: <span style="padding-left: 4px"><%= invoice.pickup_number %></span>
             </div>
         <% end %>
 
         <div style="border-bottom: 2px solid black; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
-            JR EXPRESS Load #: <span style="padding-left: 8px"><%= invoice.invoice_number %></span>
+            JR EXPRESS Load #: <span style="padding-left: 4px"><%= invoice.invoice_number %></span>
         </div>
 
         <div style="margin-bottom: 1.5rem; display: -webkit-box; ">
@@ -103,11 +103,3 @@
         </div>
     </div>
 </div>
-
-<% if invoice.images&.length > 0 %>
-    <p style="page-break-after: always;"></p>
-<% end %>
-
-<% invoice.images.each do |image| %>
-    <%= image_tag(image.url, height: "1250") %>
-<% end %>

@@ -1,6 +1,6 @@
 class Invoice < ApplicationRecord
     has_one_attached :pdf
-    has_many_attached :images
+    has_many_attached :attachments
 
     scope :most_recent_this_year, -> {where("invoice_number LIKE ?", "#{Time.current.year % 100}%").order(invoice_number: :desc).first}
 
