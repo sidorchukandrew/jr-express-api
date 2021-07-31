@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :contacts
   resources :addresses
   resources :invoices do 
     post "/email", to: "invoices#email"

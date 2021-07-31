@@ -50,6 +50,7 @@ class InvoicesController < ApplicationController
 
   def email
     @invoice = Invoice.with_attached_pdf.find(params[:invoice_id]) 
+    Contact.find_or_create_by(email: params[:recipient])
     InvoiceMailer.with(email: email_params, invoice: @invoice).invoice_pdf.deliver_now
   end
 
