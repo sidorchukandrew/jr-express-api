@@ -61,7 +61,7 @@ class InvoicesController < ApplicationController
     end
 
     def email_params
-      params.permit([:subject, :body, :recipient])
+      params.permit([:subject, :body, :recipient, :include_bcc])
     end
 
     # Only allow a list of trusted parameters through.

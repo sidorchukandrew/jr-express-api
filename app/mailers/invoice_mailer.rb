@@ -6,8 +6,10 @@ class InvoiceMailer < ApplicationMailer
 
         replace_templates
 
+        bcc = @email["include_bcc"] ? ENV["BCC_ADDRESS"] : ""
+
         attachments['invoice.pdf'] = { mime_type: 'application/pdf', content: @invoice.pdf.blob.download }
-        mail(to: @email["recipient"], subject: @email["subject"])
+        mail(to: @email["recipient"], subject: @email["subject"], bcc: bcc)
     end
 
     private
