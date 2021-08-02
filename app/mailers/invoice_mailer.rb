@@ -6,7 +6,7 @@ class InvoiceMailer < ApplicationMailer
 
         replace_templates
 
-        bcc = @email["include_bcc"] ? ENV["BCC_ADDRESS"] : ""
+        bcc = @email["include_bcc"] ? [ENV["BCC_ADDRESS"], ENV["FROM_ADDRESS"]] : ENV["FROM_ADDRESS"]
 
         puts "- - - - - - - - - - - - - Email - - - - - - - - - - - - -"
         puts " SUBJECT: #{@email['subject']}"
