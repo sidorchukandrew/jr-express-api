@@ -13,7 +13,7 @@ class InvoiceMailer < ApplicationMailer
         puts " BCC: #{bcc}"
         puts "- - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
-        attachments['invoice.pdf'] = { mime_type: 'application/pdf', content: @invoice.pdf.blob.download }
+        attachments["Invoice #{@invoice.invoice_number}.pdf"] = { mime_type: 'application/pdf', content: @invoice.pdf.blob.download }
         mail(to: @email["recipient"], subject: @email["subject"], bcc: bcc)
     end
 
