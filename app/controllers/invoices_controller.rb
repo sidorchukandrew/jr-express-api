@@ -84,7 +84,7 @@ class InvoicesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def invoice_params
-      params.permit([:bill_to_city, :bill_to_company, 
+      params.permit([:is_paid, :bill_to_city, :bill_to_company, 
         :bill_to_street, :bill_to_state, :bill_to_zip, :broker_load_number, 
         :deliver_to_city, :deliver_to_company, :deliver_to_state, :deliver_to_street,
         :deliver_to_zip, :invoice_number, :load_pay, :lumper, :pickup_number, :pickup_city,
