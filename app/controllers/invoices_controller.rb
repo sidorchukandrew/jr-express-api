@@ -7,7 +7,7 @@ class InvoicesController < ApplicationController
 
   # GET /invoices
   def index
-    @invoices = Invoice.with_attached_pdf.all
+    @invoices = Invoice.with_attached_pdf.all.order(:invoice_number)
 
     invoices_hash = @invoices.map { |invoice| invoice.to_hash }
 
@@ -51,7 +51,25 @@ class InvoicesController < ApplicationController
   def email
     @invoice = Invoice.with_attached_pdf.find(params[:invoice_id]) 
     Contact.find_or_create_by(email: params[:recipient])
+
+    @email = Email.new do |e|
+      e.subject = params["subject"]
+      e.recipient = params["recipient"]
+      e.body = params["body"]
+      e.invoice_id = @invoice.id
+      e.bcc = params["include_bcc"] ? "#{ENV["BCC_ADDRESS"]}, #{ENV["FROM_ADDRESS"]}" : ENV["FROM_ADDRESS"]
+    end
+
+    replace_templates
+    
     InvoiceMailer.with(email: email_params, invoice: @invoice).invoice_pdf.deliver_now
+    
+    if @email.save
+      render json: @email
+    else
+      render json: @email.errors 
+    end
+
   end
 
   private
@@ -117,5 +135,10 @@ class InvoicesController < ApplicationController
         address.state = @invoice.deliver_to_state
         address.zip = @invoice.deliver_to_zip
       end
+    end
+
+    def replace_templates
+        @email["subject"] = @email["subject"].gsub("{invoice number}", @invoice.invoice_number)
+        @email["body"] = @email["body"].gsub("{invoice number}", @invoice.invoice_number)
     end
 end

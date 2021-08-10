@@ -6,15 +6,15 @@ class InvoiceMailer < ApplicationMailer
 
         replace_templates
 
-        bcc = @email["include_bcc"] ? [ENV["BCC_ADDRESS"], ENV["FROM_ADDRESS"]] : ENV["FROM_ADDRESS"]
+        @bcc = @email["include_bcc"] ? [ENV["BCC_ADDRESS"], ENV["FROM_ADDRESS"]] : [ENV["FROM_ADDRESS"]]
 
         puts "- - - - - - - - - - - - - Email - - - - - - - - - - - - -"
         puts " SUBJECT: #{@email['subject']}"
-        puts " BCC: #{bcc}"
+        puts " BCC: #{@bcc}"
         puts "- - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 
         attachments["Invoice #{@invoice.invoice_number}.pdf"] = { mime_type: 'application/pdf', content: @invoice.pdf.blob.download }
-        mail(to: @email["recipient"], subject: @email["subject"], bcc: bcc)
+        mail(to: @email["recipient"], subject: @email["subject"], bcc: @bcc)
     end
 
     private
@@ -22,5 +22,4 @@ class InvoiceMailer < ApplicationMailer
         @email["subject"] = @email["subject"].gsub("{invoice number}", @invoice.invoice_number)
         @email["body"] = @email["body"].gsub("{invoice number}", @invoice.invoice_number)
     end
-
 end
