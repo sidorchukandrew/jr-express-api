@@ -81,6 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: <%= ENV['DATABASE_NAME'] %>
-  username: <%= ENV['DATABASE_USERNAME'] %>
-  password: <%= ENV['JR_EXPRESS_API_DATABASE_PASSWORD'] %>
+  url: postgres://<%= ENV['DATABASE_USERNAME'] %>:<%= ENV['DATABASE_PASSWORD'] %>@<%= ENV['DATABASE_HOST'] %>/<%= ENV['DATABASE_NAME'] %>
