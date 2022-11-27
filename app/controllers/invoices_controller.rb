@@ -7,7 +7,7 @@ class InvoicesController < ApplicationController
 
   # GET /invoices
   def index
-    @invoices = Invoice.with_attached_pdf.all.order(:invoice_number)
+    @invoices = Invoice.with_attached_pdf.all.order(invoice_number: :desc )
 
     invoices_hash = @invoices.map { |invoice| invoice.to_hash }
 

@@ -108,6 +108,9 @@ GEM
     nio4r (2.5.7)
     nokogiri (1.11.7-x64-mingw32)
       racc (~> 1.4)
+    nokogiri (1.11.7-x86_64-darwin)
+      racc (~> 1.4)
+    pg (1.2.3)
     pg (1.2.3-x64-mingw32)
     puma (5.3.2)
       nio4r (~> 2.0)
@@ -167,6 +170,7 @@ GEM
 
 PLATFORMS
   x64-mingw32
+  x86_64-darwin-21
 
 DEPENDENCIES
   aws-sdk-s3
